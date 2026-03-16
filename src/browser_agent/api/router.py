@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 
 from browser_agent.api.schemas import (
     EmitInvoiceParams,
+    FetchBillParams,
     HealthResponse,
     JobResponse,
     TaskRequest,
@@ -39,7 +40,14 @@ async def create_task(
     assert p is not None
 
     params = None
-    if provider == "countfly" and action == "emit-invoice":
+    if provider == "copel" and action == "fetch-bill":
+        if body is None or body.params is None:
+            raise HTTPException(
+                status_code=422,
+                detail="copel/fetch-bill requires params: {reference_month} (MM/YYYY)",
+            )
+        params = FetchBillParams(**body.params)
+    elif provider == "countfly" and action == "emit-invoice":
         if body is None or body.params is None:
             raise HTTPException(
                 status_code=422,
