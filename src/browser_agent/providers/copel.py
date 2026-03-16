@@ -47,7 +47,7 @@ class CopelProvider(BaseProvider):
                 await page.wait_for_load_state("networkidle")
 
                 # Step 3: Click "Segunda via online" icon/link
-                segunda_via = page.get_by_text("Segunda via online", exact=False)
+                segunda_via = page.locator("h3", has_text="Segunda via")
                 await segunda_via.click()
                 await page.wait_for_load_state("networkidle")
                 await page.wait_for_timeout(2000)
