@@ -4,7 +4,6 @@ from browser_agent.api.schemas import FetchBillParams
 from browser_agent.config import settings
 from browser_agent.jobs.models import ProviderResult
 from browser_agent.providers.base import BaseProvider
-from browser_agent.providers.browser_factory import create_browser, create_llm
 
 
 class CopelProvider(BaseProvider):
@@ -14,7 +13,7 @@ class CopelProvider(BaseProvider):
     async def execute(
         self, action: str, params: BaseModel | None = None
     ) -> ProviderResult:
-        from browser_use import Agent
+        from playwright.async_api import async_playwright
 
         if not isinstance(params, FetchBillParams):
             return ProviderResult(
@@ -25,51 +24,104 @@ class CopelProvider(BaseProvider):
         downloads_path = settings.downloads_dir / "copel"
         downloads_path.mkdir(parents=True, exist_ok=True)
 
-        browser = create_browser(downloads_path)
-        try:
-            agent = Agent(
-                task=(
-                    "Go to the Copel login page at "
-                    "https://www.copel.com/avaweb/paginaLogin/login.jsf. "
-                    f"Log in with username '{settings.copel_username}' "
-                    f"and password '{settings.copel_password}'. "
-                    "After logging in, navigate to the "
-                    "'Segunda Via Online' option. "
-                    "In the reference month field, enter "
-                    f"'{params.reference_month}' (MM/YYYY format). "
-                    "Submit the search. "
-                    "In the results, find and click the '2 via' link. "
-                    "A dialog will open with the bill details and "
-                    "an orange button 'Fazer download da 2ª via'. "
-                    "IMPORTANT: Click precisely on the orange "
-                    "download button text inside the dialog. "
-                    "Do NOT click outside the dialog. "
-                    "If a popup appears asking "
-                    "'Deseja realmente sair do aplicativo?', "
-                    "click 'Não' to dismiss it, then click the "
-                    "orange download button again. "
-                    "A loading indicator will appear — wait for it "
-                    "to finish and the PDF file to be downloaded. "
-                    "After the download completes, extract the bill "
-                    "amount and due date from the page. "
-                    "Return the amount and due date as the final "
-                    "result."
-                ),
-                llm=create_llm(),
-                browser=browser,
-                use_vision=settings.use_vision,
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=settings.browser_headless)
+            context = await browser.new_context(
+                accept_downloads=True,
             )
-            history = await agent.run(max_steps=30)
+            page = await context.new_page()
 
-            result_text = history.final_result() or ""
-            downloaded_files = list(downloads_path.glob("*.pdf"))
-            file_path = str(downloaded_files[-1]) if downloaded_files else None
+            try:
+                # Step 1: Navigate to login page
+                await page.goto(
+                    "https://www.copel.com/avaweb/paginaLogin/login.jsf",
+                    wait_until="networkidle",
+                )
 
-            return ProviderResult(
-                status="success" if history.is_successful() else "failure",
-                file_path=file_path,
-                extracted_data={"raw_result": result_text},
-                error=None if history.is_successful() else result_text,
-            )
-        finally:
-            await browser.close()
+                # Step 2: Login
+                await page.fill(
+                    'input[name*="usuario"], input[id*="usuario"]',
+                    settings.copel_username,
+                )
+                await page.fill(
+                    'input[name*="senha"], input[id*="senha"]',
+                    settings.copel_password,
+                )
+                await page.click('button[type="submit"], input[type="submit"]')
+                await page.wait_for_load_state("networkidle")
+
+                # Step 3: Navigate to Segunda Via Online
+                segunda_via = page.get_by_text("Segunda Via Online")
+                await segunda_via.click()
+                await page.wait_for_load_state("networkidle")
+
+                # Step 4: Enter reference month
+                month_input = page.locator(
+                    'input[name*="mesReferencia"], '
+                    'input[id*="mesReferencia"], '
+                    'input[placeholder*="MM/AAAA"], '
+                    'input[placeholder*="MM/YYYY"]'
+                )
+                await month_input.fill(params.reference_month)
+
+                # Step 5: Submit search
+                submit_btn = page.locator(
+                    'button:has-text("Pesquisar"), '
+                    'button:has-text("Buscar"), '
+                    'input[type="submit"]'
+                )
+                await submit_btn.click()
+                await page.wait_for_load_state("networkidle")
+
+                # Step 6: Click "2 via" link
+                segunda_via_link = page.get_by_text("2 via").first
+                await segunda_via_link.click()
+                await page.wait_for_timeout(2000)
+
+                # Step 7: Click the orange download button in dialog
+                download_btn = page.get_by_text("Fazer download da 2ª via")
+                async with page.expect_download(timeout=60000) as download_info:
+                    await download_btn.click()
+
+                # Step 8: Save the downloaded file
+                download = await download_info.value
+                file_name = download.suggested_filename or (
+                    f"copel_{params.reference_month.replace('/', '-')}.pdf"
+                )
+                file_path = str(downloads_path / file_name)
+                await download.save_as(file_path)
+
+                # Step 9: Extract bill info from the page
+                amount_text = ""
+                due_date_text = ""
+                try:
+                    valor = page.locator(
+                        "text=/Valor.*R\\$/, text=/R\\$\\s*[\\d,.]/"
+                    ).first
+                    amount_text = await valor.text_content() or ""
+                except Exception:
+                    pass
+                try:
+                    vencimento = page.locator("text=/Vencimento/").first
+                    due_date_text = await vencimento.text_content() or ""
+                except Exception:
+                    pass
+
+                return ProviderResult(
+                    status="success",
+                    file_path=file_path,
+                    extracted_data={
+                        "amount": amount_text.strip(),
+                        "due_date": due_date_text.strip(),
+                        "reference_month": params.reference_month,
+                    },
+                )
+
+            except Exception as e:
+                return ProviderResult(
+                    status="failure",
+                    error=str(e),
+                )
+            finally:
+                await context.close()
+                await browser.close()
