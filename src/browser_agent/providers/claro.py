@@ -66,7 +66,9 @@ class ClaroProvider(BaseProvider):
                 await cpf_input.fill(settings.claro_username)
 
                 # Step 4: Click "Continuar"
-                await page.get_by_text("Continuar").click()
+                await page.locator(
+                    "button.mdn-Button--primary:has-text('Continuar')"
+                ).click()
                 await page.wait_for_load_state("networkidle")
                 await page.wait_for_timeout(2000)
 
