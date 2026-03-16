@@ -40,8 +40,11 @@ class CopelProvider(BaseProvider):
                     "Submit the search. "
                     "In the results, find and click the '2 via' link. "
                     "A dialog will open. Click the button "
-                    "'Fazer download da 2ª via' to download the PDF. "
-                    "After downloading, extract the bill amount "
+                    "'Fazer download da 2ª via'. "
+                    "A loading indicator will appear — wait for it "
+                    "to finish and the PDF file to be downloaded. "
+                    "After the download completes, extract the bill "
+                    "amount "
                     "and due date from the page. "
                     "Return the amount and due date as the final result."
                 ),
