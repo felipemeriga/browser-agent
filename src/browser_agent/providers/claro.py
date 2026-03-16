@@ -61,8 +61,8 @@ class ClaroProvider(BaseProvider):
                 await page.wait_for_load_state("networkidle")
                 await page.wait_for_timeout(2000)
 
-                # Step 3: Fill CPF
-                cpf_input = page.get_by_placeholder("CPF, celular ou outro dado")
+                # Step 3: Fill CPF (label-based input, not placeholder)
+                cpf_input = page.get_by_label("CPF, celular ou outro dado")
                 await cpf_input.fill(settings.claro_username)
 
                 # Step 4: Click "Continuar"
@@ -70,8 +70,8 @@ class ClaroProvider(BaseProvider):
                 await page.wait_for_load_state("networkidle")
                 await page.wait_for_timeout(2000)
 
-                # Step 5: Fill password
-                await page.get_by_placeholder("Senha").fill(settings.claro_password)
+                # Step 5: Fill password (label-based input)
+                await page.get_by_label("Senha").fill(settings.claro_password)
 
                 # Step 6: Click "Entrar" to login
                 await page.get_by_text("Entrar").first.click()
