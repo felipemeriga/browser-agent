@@ -65,10 +65,19 @@ class ClaroProvider(BaseProvider):
                 cpf_input = page.get_by_label("CPF, celular ou outro dado")
                 await cpf_input.fill(settings.claro_username)
 
-                # Step 4: Click "Continuar"
-                await page.locator(
+                # Step 4: Click "Continuar" (button starts disabled)
+                continuar_btn = page.locator(
                     "button.mdn-Button--primary:has-text('Continuar')"
-                ).click()
+                )
+                await page.wait_for_function(
+                    "() => {"
+                    "const b = document.querySelector("
+                    '"button.mdn-Button--primary");'
+                    "return b && !b.disabled;"
+                    "}",
+                    timeout=15000,
+                )
+                await continuar_btn.click()
                 await page.wait_for_load_state("networkidle")
                 await page.wait_for_timeout(2000)
 
