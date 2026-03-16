@@ -21,6 +21,10 @@ class JobResponse(BaseModel):
     download_url: str | None = None
 
 
+class FetchBillParams(BaseModel):
+    reference_month: str  # MM/YYYY format
+
+
 class EmitInvoiceParams(BaseModel):
     amount: float
     description: str

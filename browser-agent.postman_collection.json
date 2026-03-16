@@ -42,6 +42,10 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"params\": {\n    \"reference_month\": \"03/2026\"\n  }\n}"
+            },
             "url": {
               "raw": "{{base_url}}/tasks/copel/fetch-bill",
               "host": ["{{base_url}}"],

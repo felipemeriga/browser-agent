@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from browser_agent.api.schemas import FetchBillParams
 from browser_agent.config import settings
 from browser_agent.jobs.models import ProviderResult
 from browser_agent.providers.base import BaseProvider
@@ -15,6 +16,12 @@ class CopelProvider(BaseProvider):
     ) -> ProviderResult:
         from browser_use import Agent
 
+        if not isinstance(params, FetchBillParams):
+            return ProviderResult(
+                status="failure",
+                error="fetch-bill requires reference_month (MM/YYYY)",
+            )
+
         downloads_path = settings.downloads_dir / "copel"
         downloads_path.mkdir(parents=True, exist_ok=True)
 
@@ -26,10 +33,16 @@ class CopelProvider(BaseProvider):
                     "https://www.copel.com/avaweb/paginaLogin/login.jsf. "
                     f"Log in with username '{settings.copel_username}' "
                     f"and password '{settings.copel_password}'. "
-                    f"Navigate to the bills/invoices section. "
-                    f"Find and download the most recent energy bill as PDF. "
-                    f"After downloading, extract the bill amount and due date. "
-                    f"Return the amount and due date as the final result."
+                    "After logging in, navigate to the "
+                    "'Segunda Via Online' option. "
+                    "In the reference month field, enter "
+                    f"'{params.reference_month}' (MM/YYYY format). "
+                    "Submit the search. "
+                    "In the results, find and click the '2 via' link "
+                    "to download the bill PDF. "
+                    "After downloading, extract the bill amount "
+                    "and due date from the page. "
+                    "Return the amount and due date as the final result."
                 ),
                 llm=create_llm(),
                 browser=browser,
