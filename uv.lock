@@ -234,7 +234,7 @@ wheels = [
 ]
 
 [[package]]
-name = "browser-agent"
+name = "browser-scraper"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

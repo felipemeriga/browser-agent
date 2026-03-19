@@ -3,7 +3,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from browser_agent.jobs.models import JobStatus
+from browser_scraper.jobs.models import JobStatus
 
 
 class TaskRequest(BaseModel):

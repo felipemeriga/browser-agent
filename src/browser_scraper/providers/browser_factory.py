@@ -2,7 +2,7 @@ from pathlib import Path
 
 from browser_use import Browser, ChatOpenAI
 
-from browser_agent.config import settings
+from browser_scraper.config import settings
 
 
 def create_browser(downloads_path: Path | None = None) -> Browser:

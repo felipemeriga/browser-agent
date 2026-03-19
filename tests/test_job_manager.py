@@ -2,8 +2,8 @@ import asyncio
 
 import pytest
 
-from browser_agent.jobs.manager import JobManager
-from browser_agent.jobs.models import JobStatus, ProviderResult
+from browser_scraper.jobs.manager import JobManager
+from browser_scraper.jobs.models import JobStatus, ProviderResult
 
 
 @pytest.fixture

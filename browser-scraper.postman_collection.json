@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Browser Agent",
-    "description": "Browser automation agent API for fetching utility bills and emitting invoices",
+    "name": "Browser Scraper",
+    "description": "Browser automation scraper API for fetching utility bills and emitting invoices",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

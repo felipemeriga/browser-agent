@@ -3,10 +3,10 @@ import logging
 
 from pydantic import BaseModel
 
-from browser_agent.api.schemas import ClaroFetchBillParams
-from browser_agent.config import settings
-from browser_agent.jobs.models import ProviderResult
-from browser_agent.providers.base import BaseProvider
+from browser_scraper.api.schemas import ClaroFetchBillParams
+from browser_scraper.config import settings
+from browser_scraper.jobs.models import ProviderResult
+from browser_scraper.providers.base import BaseProvider
 
 logger = logging.getLogger(__name__)
 

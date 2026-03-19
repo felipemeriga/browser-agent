@@ -1,4 +1,4 @@
-from browser_agent.providers.base import BaseProvider
+from browser_scraper.providers.base import BaseProvider
 
 
 class ProviderRegistry:

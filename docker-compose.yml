@@ -1,5 +1,5 @@
 services:
-  browser-agent:
+  browser-scraper:
     build: .
     ports:
       - "8000:8000"

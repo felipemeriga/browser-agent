@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from browser_agent.api.schemas import (
+from browser_scraper.api.schemas import (
     ClaroFetchBillParams,
     EmitInvoiceParams,
     FetchBillParams,
@@ -11,10 +11,10 @@ from browser_agent.api.schemas import (
     JobResponse,
     TaskRequest,
 )
-from browser_agent.config import settings
-from browser_agent.jobs.manager import JobManager
-from browser_agent.jobs.models import JobStatus
-from browser_agent.providers.registry import registry
+from browser_scraper.config import settings
+from browser_scraper.jobs.manager import JobManager
+from browser_scraper.jobs.models import JobStatus
+from browser_scraper.providers.registry import registry
 
 router = APIRouter()
 job_manager = JobManager()

@@ -1,8 +1,8 @@
 import asyncio
 from datetime import datetime, timezone
 
-from browser_agent.config import settings
-from browser_agent.jobs.models import Job, JobStatus, ProviderResult
+from browser_scraper.config import settings
+from browser_scraper.jobs.models import Job, JobStatus, ProviderResult
 
 
 class JobManager:

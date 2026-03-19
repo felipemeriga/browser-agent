@@ -4,11 +4,11 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from pydantic import BaseModel
 
-from browser_agent.api.router import job_manager
-from browser_agent.jobs.models import ProviderResult
-from browser_agent.main import app
-from browser_agent.providers.base import BaseProvider
-from browser_agent.providers.registry import registry
+from browser_scraper.api.router import job_manager
+from browser_scraper.jobs.models import ProviderResult
+from browser_scraper.main import app
+from browser_scraper.providers.base import BaseProvider
+from browser_scraper.providers.registry import registry
 
 
 class FakeProvider(BaseProvider):

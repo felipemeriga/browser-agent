@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
 
-from browser_agent.jobs.models import ProviderResult
+from browser_scraper.jobs.models import ProviderResult
 
 
 class BaseProvider(ABC):

@@ -1,6 +1,6 @@
-# Browser Agent
+# Browser Scraper
 
-Browser automation agent for fetching utility bills and emitting invoices from Brazilian service providers. Built with FastAPI, Playwright, and [browser-use](https://github.com/browser-use/browser-use).
+Browser automation scraper for fetching utility bills and emitting invoices from Brazilian service providers. Built with FastAPI, Playwright, and [browser-use](https://github.com/browser-use/browser-use).
 
 ## Supported Providers
 
@@ -21,8 +21,8 @@ Browser automation agent for fetching utility bills and emitting invoices from B
 
 ```bash
 # Clone and install
-git clone https://github.com/felipemeriga/browser-agent.git
-cd browser-agent
+git clone https://github.com/felipemeriga/browser-scraper.git
+cd browser-scraper
 uv sync
 
 # Install Playwright browsers
@@ -37,7 +37,7 @@ cp .env.example .env
 
 ```bash
 # Start the API server
-uv run fastapi run src/browser_agent/main.py --port 8000
+uv run fastapi run src/browser_scraper/main.py --port 8000
 ```
 
 The API will be available at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
@@ -112,7 +112,7 @@ uv run ruff format src/ tests/
 | `BROWSER_HEADLESS` | `false` | Run browser in headless mode |
 | `OPENAI_API_KEY` | — | OpenAI API key for the LLM agent |
 | `LLM_MODEL` | `gpt-4o-mini` | LLM model to use |
-| `USE_VISION` | `false` | Enable vision for the browser agent |
+| `USE_VISION` | `false` | Enable vision for the browser scraper |
 | `DOWNLOADS_DIR` | `./downloads` | Directory for downloaded files |
 | `API_PORT` | `8000` | API server port |
 | `MAX_CONCURRENT_TASKS` | `2` | Max parallel browser tasks |
